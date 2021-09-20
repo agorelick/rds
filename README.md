@@ -28,10 +28,21 @@ install.packages('rds/rds_0.1.0.tar.gz',type='src',repos=NULL)
 
 # Calculating RDS values
 
+RDS values for example trees in Figure 2a-d of the publication can be calculated as follows:
+
 ![alt text](https://github.com/agorelick/rds/blob/main/etc/fig2a-d.png "Examples of RDS calculations from Figure 2a-d.")
 
 ```r
-## fig2a
-rds(k=9,l=2,m=2) 
+## Fig. 2a
+rds(k=9,l=2,m=2) # 0.05263158
+
+## Fig. 2b
+rds(k=6,l=5,m=5) # 0.001667064
+
+## Fig. 2c
+rds(k=6,l=2,m=2) # 0.07692308
+
+## Fig. 2d
+rds(k=4,l=2,m=5) # 0.5897436
 ```
 
