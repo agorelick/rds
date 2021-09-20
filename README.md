@@ -28,7 +28,7 @@ install.packages('rds/rds_0.1.0.tar.gz',type='src',repos=NULL)
 
 # Calculating RDS values
 
-![alt text](https://github.com/agorelick/rds/blob/master/etc/fig2a-d.png "Examples of RDS calculations from Figure 2a-d.")
+![alt text](https://github.com/agorelick/rds/blob/main/etc/fig2a-d.png "Examples of RDS calculations from Figure 2a-d.")
 
 ```r
 ## fig2a
