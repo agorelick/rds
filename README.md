@@ -1,5 +1,4 @@
-# rds
-Root diversity score (RDS)
+# Root diversity score (RDS)
 
 R implementation of root diversity score (RDS) calculation (Reiter et al, Nature Genetics, 2020). Translated from the original python by Martin Blohmer. Packaged into an R library and maintained by Alexander Gorelick.
 
