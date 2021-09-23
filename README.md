@@ -4,7 +4,7 @@ R implementation of root diversity score (RDS) calculation (Reiter et al, Nature
 
 **Please cite**: Reiter et al., Nature Genetics, 2020. https://doi.org/10.1038/s41588-020-0633-2
 
-# Installation
+## Quick installation from GitHub
 
 You can quickly install this package directly from the github repository using the 'devtools' R package:
 ```r
@@ -13,8 +13,9 @@ install.packages('devtools')
 devtools::install_github('agorelick/rds')
 ```
 
+## Alternative installation from source code
 
-Alternatively, you install 'rds' the package by first cloning the github repository:
+You can also install 'rds' the package from the source code. First, in your terminal, clone the github repository:
 ```
 ## clone the repo in bash
 git clone https://github.com/agorelick/rds
