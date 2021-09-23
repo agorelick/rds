@@ -139,17 +139,9 @@ min_cluster_probability <- function(k, m, l) {
 ##' @return probabilility that a cluster of size l arises by chance
 ##' @export
 rds <- function(k,m,l) {
-    if(l==1) {
-        return(1)
-    } else if(l < 1) {
-        stop('Size of largest cluster l can not be smaller than 1')
-    } else {
-        n <- k + m
-        no_trees <- as.numeric(no_trees_min_cluster(k, m, l))
-    
-        # uses the result from equation (S1) and implements equation (S2)
-        no_trees / as.numeric(calculate_no_trees(n))
-    }
+    RDS_vector <- Vectorize(min_cluster_probability)
+    out <- RDS_vector(k, m, l)
+    out
 }
 
 
