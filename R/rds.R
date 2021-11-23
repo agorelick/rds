@@ -136,12 +136,22 @@ min_cluster_probability <- function(k, m, l) {
 ##' @param phy Either a phylo-object (as from ape::nj()) or a distance matrix (square matrix).
 ##' @return data.frame where rows are metastasis sample-types and columns are k, l, m, and rds values.
 ##' @export
-klm <- function(phy) {
-    require(stringr)
+klm <- function(phy){
+    require(dplyr)
+    require(purrr)
+    require(tibble)
 
     ## if input was a distance matrix and not a phy object
-    if('matrix' %in% class(phy) & nrow(phy)==ncol(phy))  phy <- nj(phy)
-    
+    if('matrix' %in% class(phy)) {
+           phy <- nj(phy)
+    }
+
+    ## root the tree at the normal
+    if(!is.rooted(phy)) {
+        node.number <- grep('^N',phy$tip.label)
+        phy <- phytools::reroot(phy, node.number=node.number)
+    }
+
     # get sample type of each sample
     st <- sapply(phy$tip.label,function(x) unlist(strsplit(x,"[0-9]+"))[1])
 
@@ -167,18 +177,15 @@ klm <- function(phy) {
     m <- integer()
 
     rootID <- length(phy$tip.label) + 1
-
+    
     # get metastasis types in the tree
     sel_m <- df_tt[,1]
     mettype <- as.character(df_tt[sel_m,1])
 
     # skip klm calculation if only one sample type is present             
-    if (length(mettype)<2) {return()} 
+    if (length(mettype)<2) {return()}  
 
     for (met in mettype) {
-
-        # skip klm for primary tumor    
-        if (str_detect(met, "^P$|^PT[a-z]?$")) {next}    
 
         m[met] <- ntt[met]
         k[met] <- sum(ntt) - m[met]
@@ -190,7 +197,6 @@ klm <- function(phy) {
 
             #change to original KLM script, added map function because the original version would count 
             # samples with a different suffixes as different samples (LN1a wouldn't count as LN)
-            #labels_st <- map(sapply(labels,function(x) strsplit(x,"[0-9]+")),1)
             labels_st <- sapply(labels,function(x) strsplit(x,"[0-9]+")[[1]][1])
             labels_st[which(labels_st=="PerOv")] <- "Per"
             labels_st[str_detect(labels_st, "^PT")]  <-  "P"
@@ -206,12 +212,14 @@ klm <- function(phy) {
         }
     }
 
-    df  <- data.frame(k=k,l=l,m=m)
-    for(i in 1:nrow(df)) {
-        df$rds[i] <- rds(k=df$k[i],m=df$m[i],l=df$l[i])
-    }
+    df <- data.frame(k=k,l=l,m=m)  %>% 
+        rownames_to_column(var="met")  %>% 
+        mutate(RDS=rds(k,m,l))  %>% 
+        drop_na 
+
     return(df)
-}
+}  
+
 
 
 ##' rds
