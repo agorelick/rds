@@ -134,12 +134,10 @@ min_cluster_probability <- function(k, m, l) {
 ##' klm
 ##' 
 ##' @param phy Either a phylo-object (as from ape::nj()) or a distance matrix (square matrix).
-##' @return data.frame where rows are metastasis sample-types and columns are k, l, m, and rds values.
+##' @return data.frame where rows are metastasis sample-types and columns are k, l, m, and RDS values.
 ##' @export
-klm <- function(phy){
-    require(dplyr)
-    require(purrr)
-    require(tibble)
+klm <- function(phy, drop_na=T){
+    require(stringr)
 
     ## if input was a distance matrix and not a phy object
     if('matrix' %in% class(phy)) {
@@ -167,6 +165,10 @@ klm <- function(phy){
     # get number of samples for each tumor type
     df_tt <- data.frame(table(tt))
 
+    # get metastasis types in the tree
+    sel_m <- df_tt[,1]
+    tumor_types <- as.character(df_tt[sel_m,1])
+
     ntt <- integer()
     for (tumor in df_tt[,1]) {
         ntt[tumor] <- df_tt[which(df_tt[,1]==tumor),2]
@@ -175,17 +177,12 @@ klm <- function(phy){
     k <- integer()
     l <- integer()
     m <- integer()
-
     rootID <- length(phy$tip.label) + 1
-    
-    # get metastasis types in the tree
-    sel_m <- df_tt[,1]
-    mettype <- as.character(df_tt[sel_m,1])
 
     # skip klm calculation if only one sample type is present             
-    if (length(mettype)<2) {return()}  
+    if (length(tumor_types)<2) {return()}  
 
-    for (met in mettype) {
+    for (met in tumor_types) {
 
         m[met] <- ntt[met]
         k[met] <- sum(ntt) - m[met]
@@ -212,11 +209,13 @@ klm <- function(phy){
         }
     }
 
-    df <- data.frame(k=k,l=l,m=m)  %>% 
-        rownames_to_column(var="met")  %>% 
-        mutate(RDS=rds(k,m,l))  %>% 
-        drop_na 
+    df <- data.frame(k=k,l=l,m=m)
+    df <- cbind(met=rownames(df), df)
+    for(i in 1:nrow(df)) df$RDS[i] <- rds(k=df$k[i],m=df$m[i],l=df$l[i])
+    df
 
+    if(drop_na) df <- df[!is.na(df$RDS),]
+    rownames(df) <- NULL
     return(df)
 }  
 
