@@ -61,7 +61,6 @@ multibinomial <- function(m, l, cluster_numbers) {
 ##' @return number of trees where the given clusters have independent origin
 ##' @export
 no_trees_with_clusters <- function(k, clusters){
-    require(gmp)
     n = k + sum(clusters)
     no_trees = 1
     for (c in clusters){
@@ -110,7 +109,7 @@ no_trees_min_cluster <- function(k, m, l){
 ##' @export
 min_cluster_probability <- function(k, m, l) {
     if (l > m) {
-        stop("L is larger than M. Make sure KLM values are accurate to continue.")
+        stop('L is larger than M. Make sure KLM values are accurate to continue.')
     }
     if (m == 1) {
         NA 
@@ -124,11 +123,94 @@ min_cluster_probability <- function(k, m, l) {
         if (is.infinite(no_trees) | is.infinite(calculate_no_trees(n))) {
             stop("The number of trees calculated are too large for R to handle. Reduce input KLM or change script.")
         }
-        # if the number of trees gets too large, R can’t display it and will difine it as infinite.
+        # if the number of trees gets too large, R can't display it and will difine it as infinite.
         # to adapt the script to work with R, the RDS
         # uses the result from equation (S1) and implements equation (S2)
         as.numeric(no_trees / calculate_no_trees(n))
     }
+}
+
+
+##' klm
+##' 
+##' @param phy Either a phylo-object (as from ape::nj()) or a distance matrix (square matrix).
+##' @return data.frame where rows are metastasis sample-types and columns are k, l, m, and rds values.
+##' @export
+klm <- function(phy) {
+    require(stringr)
+
+    ## if input was a distance matrix and not a phy object
+    if('matrix' %in% class(phy) & nrow(phy)==ncol(phy))  phy <- nj(phy)
+    
+    # get sample type of each sample
+    st <- sapply(phy$tip.label,function(x) unlist(strsplit(x,"[0-9]+"))[1])
+
+    st[which(st=="PerOv")] <- "Per"
+
+    # select tumor samples
+    sel_t  <- str_detect(st, "^N", negate=TRUE)          
+    # tumor samples
+    tt <- st[sel_t]
+
+    #rename all "PT" samples to "P"   
+    tt[str_detect(tt, "^PT")]  <-  "P"
+    # get number of samples for each tumor type
+    df_tt <- data.frame(table(tt))
+
+    ntt <- integer()
+    for (tumor in df_tt[,1]) {
+        ntt[tumor] <- df_tt[which(df_tt[,1]==tumor),2]
+    }
+
+    k <- integer()
+    l <- integer()
+    m <- integer()
+
+    rootID <- length(phy$tip.label) + 1
+
+    # get metastasis types in the tree
+    sel_m <- df_tt[,1]
+    mettype <- as.character(df_tt[sel_m,1])
+
+    # skip klm calculation if only one sample type is present             
+    if (length(mettype)<2) {return()} 
+
+    for (met in mettype) {
+
+        # skip klm for primary tumor    
+        if (str_detect(met, "^P$|^PT[a-z]?$")) {next}    
+
+        m[met] <- ntt[met]
+        k[met] <- sum(ntt) - m[met]
+        l[met] <- 1
+
+        for (i in rootID:max(phy$edge[,1])) {
+            clade <- extract.clade(phy, i)
+            labels <- clade$tip.label
+
+            #change to original KLM script, added map function because the original version would count 
+            # samples with a different suffixes as different samples (LN1a wouldn't count as LN)
+            #labels_st <- map(sapply(labels,function(x) strsplit(x,"[0-9]+")),1)
+            labels_st <- sapply(labels,function(x) strsplit(x,"[0-9]+")[[1]][1])
+            labels_st[which(labels_st=="PerOv")] <- "Per"
+            labels_st[str_detect(labels_st, "^PT")]  <-  "P"
+
+            clade_size <- length(labels)
+            # get the size of the largest clade formed by a given met
+
+            if (length(which(labels_st==met))==clade_size) {
+                if (clade_size > l[met]) {
+                    l[met] = clade_size
+                }
+            }
+        }
+    }
+
+    df  <- data.frame(k=k,l=l,m=m)
+    for(i in 1:nrow(df)) {
+        df$rds[i] <- rds(k=df$k[i],m=df$m[i],l=df$l[i])
+    }
+    return(df)
 }
 
 
@@ -141,6 +223,7 @@ min_cluster_probability <- function(k, m, l) {
 ##' @return probabilility that a cluster of size l arises by chance
 ##' @export
 rds <- function(k,m,l) {
+    require(gmp)
     RDS_vector <- Vectorize(min_cluster_probability)
     out <- RDS_vector(k, m, l)
     out

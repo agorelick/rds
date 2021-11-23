@@ -3,6 +3,7 @@
 export(calculate_no_common_trees)
 export(calculate_no_trees)
 export(cluster_probability)
+export(klm)
 export(min_cluster_probability)
 export(multibinomial)
 export(no_trees_min_cluster)
