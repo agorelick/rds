@@ -136,7 +136,7 @@ min_cluster_probability <- function(k, m, l) {
 ##' @param phy Either a phylo-object (as from ape::nj()) or a distance matrix (square matrix).
 ##' @return data.frame where rows are metastasis sample-types and columns are k, l, m, and RDS values.
 ##' @export
-klm <- function(phy, drop_na=T){
+klm <- function(phy, drop_na=T, primary_as_PT=T){
     require(stringr)
 
     ## if input was a distance matrix and not a phy object
@@ -211,8 +211,13 @@ klm <- function(phy, drop_na=T){
 
     df <- data.frame(k=k,l=l,m=m)
     df <- cbind(met=rownames(df), df)
-    for(i in 1:nrow(df)) df$RDS[i] <- rds(k=df$k[i],m=df$m[i],l=df$l[i])
-    df
+    if(primary_as_PT==T & any(df$met=='P')) {
+        df$met[df$met=='P'] <- 'PT'
+    }
+
+    for(i in 1:nrow(df)) {
+        df$RDS[i] <- rds(k=df$k[i],m=df$m[i],l=df$l[i])
+    }
 
     if(drop_na) df <- df[!is.na(df$RDS),]
     rownames(df) <- NULL
@@ -229,13 +234,10 @@ klm <- function(phy, drop_na=T){
 ##' @param l number of metastases that actually cluster together
 ##' @return probabilility that a cluster of size l arises by chance
 ##' @export
-rds <- function(k,m,l,primary_as_PT=T) {
+rds <- function(k,m,l) {
     require(gmp)
     RDS_vector <- Vectorize(min_cluster_probability)
     out <- RDS_vector(k, m, l)
-    if(primary_as_PT==T & any(out$met=='P')) {
-        out$met[out$met=='P'] <- 'PT'
-    }
     out
 }
 
