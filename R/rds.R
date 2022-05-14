@@ -229,10 +229,13 @@ klm <- function(phy, drop_na=T){
 ##' @param l number of metastases that actually cluster together
 ##' @return probabilility that a cluster of size l arises by chance
 ##' @export
-rds <- function(k,m,l) {
+rds <- function(k,m,l,primary_as_PT=T) {
     require(gmp)
     RDS_vector <- Vectorize(min_cluster_probability)
     out <- RDS_vector(k, m, l)
+    if(primary_as_PT==T & any(out$met=='P')) {
+        out$met[out$met=='P'] <- 'PT'
+    }
     out
 }
 
