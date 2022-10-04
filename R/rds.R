@@ -152,7 +152,7 @@ klm <- function(phy, drop_na=T, primary_as_PT=T){
 
     # get sample type of each sample
     st <- sapply(phy$tip.label,function(x) unlist(strsplit(x,"[0-9]+"))[1])
-
+    st[grep('PT[a-z]',st)] <- 'PT'
     st[which(st=="PerOv")] <- "Per"
 
     # select tumor samples
@@ -195,6 +195,7 @@ klm <- function(phy, drop_na=T, primary_as_PT=T){
             #change to original KLM script, added map function because the original version would count 
             # samples with a different suffixes as different samples (LN1a wouldn't count as LN)
             labels_st <- sapply(labels,function(x) strsplit(x,"[0-9]+")[[1]][1])
+            labels_st[grep('PT[a-z]',labels_st)] <- 'PT'
             labels_st[which(labels_st=="PerOv")] <- "Per"
             labels_st[str_detect(labels_st, "^PT")]  <-  "P"
 

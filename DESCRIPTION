@@ -1,7 +1,7 @@
 Package: rds
 Type: Package
 Title: Root diversity score (RDS)
-Version: 0.1.0
+Version: 0.1.1
 Date: 2021-09-20
 Author: Johannes Reiter, Martin Blohmer, Alexander Gorelick
 Maintainer: Alexander Gorelick <agorelick@mgh.harvard.edu>

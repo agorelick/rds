@@ -4,13 +4,13 @@
 \alias{klm}
 \title{klm}
 \usage{
-klm(phy)
+klm(phy, drop_na = T, primary_as_PT = T)
 }
 \arguments{
 \item{phy}{Either a phylo-object (as from ape::nj()) or a distance matrix (square matrix).}
 }
 \value{
-data.frame where rows are metastasis sample-types and columns are k, l, m, and rds values.
+data.frame where rows are metastasis sample-types and columns are k, l, m, and RDS values.
 }
 \description{
 klm
