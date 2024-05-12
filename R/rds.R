@@ -140,10 +140,10 @@ min_cluster_probability <- function(k, m, l, use_gmp) {
 ##'
 ##' @param phy A phylo-class cancer phylogeny
 ##' @param drop_na Omit rows in the output data.frame with NA RDS values (detault=T)
-##' @param use_gmp Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=F)
+##' @param use_gmp Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=T)
 ##' @return data.frame where rows are metastasis sample-types and columns are k, l, m, and RDS values.
 ##' @export
-rds <- function(phy, drop_na=T, use_gmp=F){
+rds <- function(phy, drop_na=T, use_gmp=T){
     require(stringr)
 
     ## root the tree at the normal

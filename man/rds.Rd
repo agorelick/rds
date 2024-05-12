@@ -4,14 +4,14 @@
 \alias{rds}
 \title{rds}
 \usage{
-rds(phy, drop_na = T, use_gmp = F)
+rds(phy, drop_na = T, use_gmp = T)
 }
 \arguments{
 \item{phy}{A phylo-class cancer phylogeny}
 
 \item{drop_na}{Omit rows in the output data.frame with NA RDS values (detault=T)}
 
-\item{use_gmp}{Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=F)}
+\item{use_gmp}{Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=T)}
 }
 \value{
 data.frame where rows are metastasis sample-types and columns are k, l, m, and RDS values.
