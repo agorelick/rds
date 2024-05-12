@@ -27,8 +27,9 @@ Then start R and install the package:
 install.packages('rds/rds_0.1.0.tar.gz',type='src',repos=NULL)
 ```
 
-# Calculating RDS values
+# Using the RDS package
 
+## Calculating RDS given k,l,m values
 RDS values for example trees in Figure 2a-d of the publication can be calculated as follows:
 
 ![alt text](https://github.com/agorelick/rds/blob/main/etc/fig2a-d.png "Examples of RDS calculations from Figure 2a-d.")
@@ -46,4 +47,28 @@ calculate_rds(k=6,l=2,m=2) # 0.07692308
 ## Fig. 2d
 calculate_rds(k=4,l=2,m=5) # 0.5897436
 ```
+
+## Calculate RDS values given a cancer phylogeny (phylo object)
+
+```r
+## create a random tree with 20 tumor samples (+ 1 normal)
+set.seed(123)
+size <- 21
+tree <- rtree(size)
+tips <- tree$tip.label
+
+## randomly assign tips to be the normal (N1), primary (PT) or metastasis (M) samples
+primary_samples <- tips[sample(2:(size-3))]
+remaining_samples <- tips[!tips %in% primary_samples]
+normal_sample <- sample(remaining_samples,1)
+metastasis_samples <- remaining_samples[!remaining_samples %in% normal_sample]
+tree$tip.label[tree$tip.label==normal_sample] <- 'N1'
+tree$tip.label[tree$tip.label %in% primary_samples] <- paste0('PT',1:length(primary_samples))
+tree$tip.label[tree$tip.label %in% metastasis_samples] <- paste0('M',1:length(metastasis_samples))
+
+## calculate RDS values for this tree
+rds(tree, use_gmp=F) # RDS for M samples: 0.002316602
+```
+
+
 
