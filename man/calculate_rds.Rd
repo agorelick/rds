@@ -4,7 +4,7 @@
 \alias{calculate_rds}
 \title{calculate_rds}
 \usage{
-calculate_rds(k, m, l, use_gmp)
+calculate_rds(k, m, l, use_gmp = T)
 }
 \arguments{
 \item{k}{number of primary tumor region samples}
@@ -13,7 +13,7 @@ calculate_rds(k, m, l, use_gmp)
 
 \item{l}{number of metastases that actually cluster together}
 
-\item{use_gmp}{Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=F)}
+\item{use_gmp}{Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=T)}
 }
 \value{
 probabilility that a cluster of size l arises by chance

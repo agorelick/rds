@@ -229,10 +229,10 @@ rds <- function(phy, drop_na=T, use_gmp=T){
 ##' @param k number of primary tumor region samples
 ##' @param m total number of metastases samples
 ##' @param l number of metastases that actually cluster together
-##' @param use_gmp Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=F)
+##' @param use_gmp Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=T)
 ##' @return probabilility that a cluster of size l arises by chance
 ##' @export
-calculate_rds <- function(k,m,l, use_gmp) {
+calculate_rds <- function(k,m,l, use_gmp=T) {
     RDS_vector <- Vectorize(min_cluster_probability)
     out <- RDS_vector(k, m, l, use_gmp=use_gmp)
     out
