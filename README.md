@@ -67,7 +67,7 @@ tree$tip.label[tree$tip.label %in% primary_samples] <- paste0('PT',1:length(prim
 tree$tip.label[tree$tip.label %in% metastasis_samples] <- paste0('M',1:length(metastasis_samples))
 
 ## calculate RDS values for this tree
-rds(tree, use_gmp=F) # RDS for M samples: 0.002316602
+rds(tree) # RDS for M samples: 0.002316602
 ```
 
 
