@@ -35,15 +35,15 @@ RDS values for example trees in Figure 2a-d of the publication can be calculated
 
 ```r
 ## Fig. 2a
-rds(k=9,l=2,m=2) # 0.05263158
+calculate_rds(k=9,l=2,m=2) # 0.05263158
 
 ## Fig. 2b
-rds(k=6,l=5,m=5) # 0.001667064
+calculate_rds(k=6,l=5,m=5) # 0.001667064
 
 ## Fig. 2c
-rds(k=6,l=2,m=2) # 0.07692308
+calculate_rds(k=6,l=2,m=2) # 0.07692308
 
 ## Fig. 2d
-rds(k=4,l=2,m=5) # 0.5897436
+calculate_rds(k=4,l=2,m=5) # 0.5897436
 ```
 
