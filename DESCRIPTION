@@ -1,12 +1,10 @@
 Package: rds
 Type: Package
 Title: Root diversity score (RDS)
-Version: 0.1.1
-Date: 2021-09-20
+Version: 0.1.2
+Date: 2024-05-11
 Author: Johannes Reiter, Martin Blohmer, Alexander Gorelick
-Maintainer: Alexander Gorelick <agorelick@mgh.harvard.edu>
+Maintainer: Alexander Gorelick <alexander_gorelick@hms.harvard.edu>
 Description: R implementation of root diversity score (RDS) calculation (Reiter et al, Nature Genetics, 2020). Translated from the original python by Martin Blohmer. Packaged into an R library and maintained by Alexander Gorelick. Please cite: Reiter et al., Nature Genetics, 2020. https://doi.org/10.1038/s41588-020-0633-2
 License: MIT
-Imports:
-    gmp
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.1

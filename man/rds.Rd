@@ -4,18 +4,18 @@
 \alias{rds}
 \title{rds}
 \usage{
-rds(k, m, l)
+rds(phy, drop_na = T, use_gmp = F)
 }
 \arguments{
-\item{k}{number of primary tumor region samples}
+\item{phy}{A phylo-class cancer phylogeny}
 
-\item{m}{total number of metastases samples}
+\item{drop_na}{Omit rows in the output data.frame with NA RDS values (detault=T)}
 
-\item{l}{number of metastases that actually cluster together}
+\item{use_gmp}{Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=F)}
 }
 \value{
-probabilility that a cluster of size l arises by chance
+data.frame where rows are metastasis sample-types and columns are k, l, m, and RDS values.
 }
 \description{
-Calculates the root diversity scores as the probability that a tree where l metastases form a cluster (have one root) exists by chance as defined by Equation (2).
+Main function to run RDS calculations on a cancer phylogeny (phylo object). Must use Naxerova Lab Normal/Primary/Metastasis tip label conventions.
 }

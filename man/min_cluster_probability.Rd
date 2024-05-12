@@ -4,7 +4,7 @@
 \alias{min_cluster_probability}
 \title{min_cluster_probability}
 \usage{
-min_cluster_probability(k, m, l)
+min_cluster_probability(k, m, l, use_gmp)
 }
 \arguments{
 \item{k}{number of primary tumor region samples}

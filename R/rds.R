@@ -65,7 +65,7 @@ no_trees_with_clusters <- function(k, clusters){
     no_trees = 1
     for (c in clusters){
         # this is an addition to the python script to allow for RDS caculcations for over 450 metastases samples     
-        c <- gmp::as.bigz(c)
+        if(class(k)=="bigz") c <- gmp::as.bigz(c)
         no_trees <-  no_trees * (factorial(2 * c - 3) / (2^(c-2) * factorial(c - 2)))
     }
     no_trees <-  no_trees * (factorial((2*k) + (2 * length(clusters) - 3)) 
@@ -107,7 +107,7 @@ no_trees_min_cluster <- function(k, m, l){
 ##' @param l number of metastases that actually cluster together
 ##' @return probabilility that a cluster of size l arises by chance
 ##' @export
-min_cluster_probability <- function(k, m, l) {
+min_cluster_probability <- function(k, m, l, use_gmp) {
     if (l > m) {
         stop('L is larger than M. Make sure KLM values are accurate to continue.')
     }
@@ -117,11 +117,14 @@ min_cluster_probability <- function(k, m, l) {
         1
     }  else {
         # this is an addition to the python script to allow for RDS caculcations for over 10,000 samples
-        k <- as.bigz(k)
+        if(use_gmp) {
+            require(gmp)
+            k <- as.bigz(k)
+        }
         n = k + m
         no_trees = no_trees_min_cluster(k, m, l)
         if (is.infinite(no_trees) | is.infinite(calculate_no_trees(n))) {
-            stop("The number of trees calculated are too large for R to handle. Reduce input KLM or change script.")
+            stop("The number of trees calculated are too large for R to handle. Reduce input KLM or use rds(...,use_gmp=T)")
         }
         # if the number of trees gets too large, R can't display it and will difine it as infinite.
         # to adapt the script to work with R, the RDS
@@ -131,18 +134,17 @@ min_cluster_probability <- function(k, m, l) {
 }
 
 
-##' klm
+##' rds
 ##' 
-##' @param phy Either a phylo-object (as from ape::nj()) or a distance matrix (square matrix).
+##' Main function to run RDS calculations on a cancer phylogeny (phylo object). Must use Naxerova Lab Normal/Primary/Metastasis tip label conventions.
+##'
+##' @param phy A phylo-class cancer phylogeny
+##' @param drop_na Omit rows in the output data.frame with NA RDS values (detault=T)
+##' @param use_gmp Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=F)
 ##' @return data.frame where rows are metastasis sample-types and columns are k, l, m, and RDS values.
 ##' @export
-klm <- function(phy, drop_na=T, primary_as_PT=T){
+rds <- function(phy, drop_na=T, use_gmp=F){
     require(stringr)
-
-    ## if input was a distance matrix and not a phy object
-    if('matrix' %in% class(phy)) {
-           phy <- nj(phy)
-    }
 
     ## root the tree at the normal
     if(!is.rooted(phy)) {
@@ -160,8 +162,6 @@ klm <- function(phy, drop_na=T, primary_as_PT=T){
     # tumor samples
     tt <- st[sel_t]
 
-    #rename all "PT" samples to "P"   
-    tt[str_detect(tt, "^PT")]  <-  "P"
     # get number of samples for each tumor type
     df_tt <- data.frame(table(tt))
 
@@ -197,7 +197,6 @@ klm <- function(phy, drop_na=T, primary_as_PT=T){
             labels_st <- sapply(labels,function(x) strsplit(x,"[0-9]+")[[1]][1])
             labels_st[grep('PT[a-z]',labels_st)] <- 'PT'
             labels_st[which(labels_st=="PerOv")] <- "Per"
-            labels_st[str_detect(labels_st, "^PT")]  <-  "P"
 
             clade_size <- length(labels)
             # get the size of the largest clade formed by a given met
@@ -211,13 +210,10 @@ klm <- function(phy, drop_na=T, primary_as_PT=T){
     }
 
     df <- data.frame(k=k,l=l,m=m)
-    df <- cbind(met=rownames(df), df)
-    if(primary_as_PT==T & any(df$met=='P')) {
-        df$met[df$met=='P'] <- 'PT'
-    }
+    df <- cbind(type=rownames(df), df)
 
     for(i in 1:nrow(df)) {
-        df$RDS[i] <- rds(k=df$k[i],m=df$m[i],l=df$l[i])
+        df$RDS[i] <- calculate_rds(k=df$k[i],m=df$m[i],l=df$l[i], use_gmp=use_gmp)
     }
 
     if(drop_na) df <- df[!is.na(df$RDS),]
@@ -227,18 +223,18 @@ klm <- function(phy, drop_na=T, primary_as_PT=T){
 
 
 
-##' rds
+##' calculate_rds
 ##' 
 ##' Calculates the root diversity scores as the probability that a tree where l metastases form a cluster (have one root) exists by chance as defined by Equation (2).
 ##' @param k number of primary tumor region samples
 ##' @param m total number of metastases samples
 ##' @param l number of metastases that actually cluster together
+##' @param use_gmp Use gmp R package to calculate RDS for large trees. Required for trees with more around 30 tips (default=F)
 ##' @return probabilility that a cluster of size l arises by chance
 ##' @export
-rds <- function(k,m,l) {
-    require(gmp)
+calculate_rds <- function(k,m,l, use_gmp) {
     RDS_vector <- Vectorize(min_cluster_probability)
-    out <- RDS_vector(k, m, l)
+    out <- RDS_vector(k, m, l, use_gmp=use_gmp)
     out
 }
 
