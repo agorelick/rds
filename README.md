@@ -51,6 +51,9 @@ calculate_rds(k=4,l=2,m=5) # 0.5897436
 ## Calculate RDS values given a cancer phylogeny (phylo object)
 
 ```r
+library(rds)
+library(ape)
+
 ## create a random tree with 20 tumor samples (+ 1 normal)
 set.seed(123)
 size <- 21
